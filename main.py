@@ -1,6 +1,20 @@
 import csv
 
 from models import Row
+from tabulate import tabulate
+
+COLUMNS_NAMES = [
+    "№",
+    "Код первого события",
+    "Код второго события",
+    "Время работы",
+    "Ранне начало",
+    "Раннее окончание",
+    "Позднее начало",
+    "Позднее окончание",
+    "Общий резерв, R",
+    "Частный резерв, r"
+]
 
 
 def parse_file(file_name: str) -> (list[Row], int):
@@ -96,6 +110,26 @@ def calculate_local_reserve(table: list[Row]):
         table[i].local_reserve = max(early_start_end) - table[i].early_end
 
 
+def print_table(table: list[Row]):
+    data = []
+
+    for el in table:
+        data.append([
+            el.first_work,
+            el.second_work,
+            el.time_work,
+            el.early_start,
+            el.early_end,
+            el.later_start,
+            el.later_end,
+            el.general_reserve,
+            el.local_reserve,
+        ])
+
+    # display table
+    print(tabulate(data, headers=COLUMNS_NAMES, showindex="always"))
+
+
 def main():
     table = parse_file("data.csv")
 
@@ -108,8 +142,7 @@ def main():
     calculate_general_reserve(table)
     calculate_local_reserve(table)
 
-    for row in table:
-        row.show_row()
+    print_table(table)
 
 
 if __name__ == '__main__':
